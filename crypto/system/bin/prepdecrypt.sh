@@ -130,7 +130,7 @@ finish_error()
 			fi
 		fi
 	fi
-	setprop crypto.ready 1
+	setprop crypto.ready 0
 	log_print 0 "Script run incomplete. Device may not be ready for decryption."
 	exit 2
 }
