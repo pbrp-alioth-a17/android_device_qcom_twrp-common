@@ -26,6 +26,7 @@ ifeq ($(BOARD_USES_QCOM_FBE_DECRYPTION),true)
     LOCAL_MODULE_CLASS := ETC
     LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)/system/bin
     LOCAL_REQUIRED_MODULES := qcom_decrypt
+    LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/crypto_fbe/init.recovery.qcom_decrypt.fbe.rc $(LOCAL_PATH)/scripts/service_cleanup.bash
 
     # Cannot send to TARGET_RECOVERY_ROOT_OUT since build system wipes init*.rc
     # during ramdisk creation and only allows init.recovery.*.rc files to be copied
@@ -45,6 +46,7 @@ ifeq ($(BOARD_USES_QCOM_DECRYPTION),true)
     LOCAL_MODULE_CLASS := ETC
     LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)/system/bin
     LOCAL_REQUIRED_MODULES := relink_binaries relink_libraries resetprop twrp_ramdisk
+    LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/crypto/init.recovery.qcom_decrypt.rc $(LOCAL_PATH)/crypto/system/bin/prepdecrypt.sh $(LOCAL_PATH)/scripts/service_cleanup.bash
 
     # Cannot send to TARGET_RECOVERY_ROOT_OUT since build system wipes init*.rc
     # during ramdisk creation and only allows init.recovery.*.rc files to be copied
@@ -57,8 +59,10 @@ ifeq ($(BOARD_USES_QCOM_DECRYPTION),true)
         grep -qF 'init.recovery.qcom_decrypt.rc' $(TARGET_RECOVERY_ROOT_OUT)/init.recovery.qcom.rc || \
         echo -e '\nimport /init.recovery.qcom_decrypt.rc' >> $(TARGET_RECOVERY_ROOT_OUT)/init.recovery.qcom.rc; \
         elif [ -e device/$(shell echo $(PRODUCT_BRAND) | tr  '[:upper:]' '[:lower:]')/$(TARGET_DEVICE)/recovery/root/init.recovery.qcom.rc ]; then \
-        grep -qF 'init.recovery.qcom_decrypt.rc' device/$(shell echo $(PRODUCT_BRAND) | tr  '[:upper:]' '[:lower:]')/$(TARGET_DEVICE)/recovery/root/init.recovery.qcom.rc || \
-        echo -e '\nimport /init.recovery.qcom_decrypt.rc' >> device/$(shell echo $(PRODUCT_BRAND) | tr  '[:upper:]' '[:lower:]')/$(TARGET_DEVICE)/recovery/root/init.recovery.qcom.rc; \
+        mkdir -p $(TARGET_RECOVERY_ROOT_OUT); \
+        cp -f device/$(shell echo $(PRODUCT_BRAND) | tr '[:upper:]' '[:lower:]')/$(TARGET_DEVICE)/recovery/root/init.recovery.qcom.rc $(TARGET_RECOVERY_ROOT_OUT)/init.recovery.qcom.rc; \
+        grep -qF 'init.recovery.qcom_decrypt.rc' $(TARGET_RECOVERY_ROOT_OUT)/init.recovery.qcom.rc || \
+        echo -e '\nimport /init.recovery.qcom_decrypt.rc' >> $(TARGET_RECOVERY_ROOT_OUT)/init.recovery.qcom.rc; \
         else echo -e '\n*** init.recovery.qcom.rc not found ***\nYou will need to manually add the import for init.recovery.qcom_decrypt.rc to your init.recovery.(ro.hardware).rc file!!\n'; fi; \
         cp -Ra $(LOCAL_PATH)/crypto/system $(TARGET_ROOT_OUT)/;
 

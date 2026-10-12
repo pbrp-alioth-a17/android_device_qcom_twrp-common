@@ -21,16 +21,6 @@ check_setpatch_override()
 		SETPATCH=$setpatch_prop
 	fi
 }
-#
-# Default TWRP values for PLATFORM_VERSION and PLATFORM_SECURITY_PATCH
-#
-# ro.build.version.release and ro.build.version.security_patch will get
-# set to the below values respectively if these props are blank when
-# the script runs. These values should be updated to reflect the
-# TWRP defaults in your device's BoardConfig.mk
-osver_twrp="99.87.36"
-patchlevel_twrp="2099-12-31"
-
 # Set default log level
 DEFAULT_LOGLEVEL=1
 # 0 Errors only
@@ -160,13 +150,9 @@ update_default_values()
 			echo "$4=$2" >> "/$DEFAULTPROP";
 			$5 "$4"
 		else
-			log_print 0 "No Original $3 found. Setting default value..."
-			osver=$osver_twrp
-			patchlevel=$patchlevel_twrp
-			$setprop_bin "$4" "$1"
-			log_print 2 "Updating $DEFAULTPROP with default $3..."
-			echo "$4=$1" >> "/$DEFAULTPROP";
-			$5 "$4"
+			log_print 0 "No original $3. Refusing to invent crypto metadata."
+			setprop crypto.ready 0
+			exit 2
 		fi
 	else
 		log_print 2 "$3 exists! $4=$1"
